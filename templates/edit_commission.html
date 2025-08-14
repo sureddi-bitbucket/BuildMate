@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Commission - Insurance System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-edit"></i> Edit Commission</h2>
+        <a href="{{ url_for('commissions') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Commissions
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form action="{{ url_for('edit_commission', commission_id=commission.id) }}" method="POST">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="application_id" class="form-label">Policy Application *</label>
+                        <select class="form-select" id="application_id" name="application_id" required>
+                            {% for policy_id, policy in user_policies.items() %}
+                            {% set user = users.get(policy.user_id, {}) %}
+                            {% set template = templates.get(policy.policy_template_id, {}) %}
+                            <option value="{{ policy_id }}" {% if commission.application_id == policy_id %}selected{% endif %}>
+                                {{ user.get('first_name', '') }} {{ user.get('last_name', '') }} - {{ template.get('name', 'Unknown') }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="commission_type" class="form-label">Commission Type *</label>
+                        <select class="form-select" id="commission_type" name="commission_type" required>
+                            <option value="New Policy" {% if commission.commission_type == 'New Policy' %}selected{% endif %}>New Policy</option>
+                            <option value="Renewal" {% if commission.commission_type == 'Renewal' %}selected{% endif %}>Renewal</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="amount" class="form-label">Commission Amount (₹) *</label>
+                        <input type="number" class="form-control" id="amount" name="amount" 
+                               step="0.01" min="0" value="{{ commission.amount }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="date" class="form-label">Commission Date *</label>
+                        <input type="date" class="form-control" id="date" name="date" 
+                               value="{{ commission.date }}" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Notes</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3">{{ commission.notes or '' }}</textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Commission
+                    </button>
+                    <a href="{{ url_for('commissions') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

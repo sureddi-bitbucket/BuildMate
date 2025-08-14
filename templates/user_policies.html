@@ -1,0 +1,873 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service Simulation - HR Recruiter/Manager (Financial Industry)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        .scenario-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .scenario-section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .scenario-content {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            margin-bottom: 20px;
+        }
+
+        .scenario-content p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            line-height: 1.8;
+        }
+
+        .task-list {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #2980b9;
+        }
+
+        .task-list h3 {
+            color: #2980b9;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .task-list ol {
+            padding-left: 25px;
+        }
+
+        .task-list li {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .data-table-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .data-table-section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .source-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .source-data-table th {
+            background: #34495e;
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .source-data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 0.9em;
+        }
+
+        .source-data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .source-data-table tr:hover {
+            background: #e3f2fd;
+        }
+
+        .status-hired {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .status-not-hired {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .completion-tables {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .completion-tables h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #f39c12;
+            padding-bottom: 10px;
+        }
+
+        .table-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .completion-table {
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #ecf0f1;
+        }
+
+        .completion-table h3 {
+            background: #f39c12;
+            color: white;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .completion-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .completion-table th {
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #bdc3c7;
+        }
+
+        .completion-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .completion-table input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .completion-table input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .instructions p {
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+        }
+
+        .timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .table-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .source-data-table {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="timer" id="timer">Time: 45:00</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Customer Service Simulation</h1>
+            <div class="subtitle">HR Recruiter/Manager (Financial Industry)</div>
+        </div>
+
+        <div class="scenario-section">
+            <h2>Scenario</h2>
+            <div class="scenario-content">
+                <p>You are an HR Manager for <strong>FinServe Inc.</strong>, a mid-sized financial services company with offices across multiple states. You are preparing a recruitment performance report for the CHRO, COO, and CFO.</p>
+                <p>We have provided you with a <strong>Source Data Table</strong> containing details of 30 recently posted roles and candidate outcomes.</p>
+            </div>
+            
+            <div class="task-list">
+                <h3>Your Task:</h3>
+                <ol>
+                    <li>Analyze the data to determine which recruitment sources produce the most hires overall and per job category.</li>
+                    <li>Calculate average "Time to Fill" for each job category and for the most effective source overall.</li>
+                    <li>Prepare recommendations for how to optimize recruitment advertising spend and job posting strategies based on your findings.</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="data-table-section">
+            <h2>Source Data Table – 30 Candidates</h2>
+            <div class="table-container">
+                <table class="source-data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Job Title</th>
+                            <th>Job Category</th>
+                            <th>Time to Fill (days)</th>
+                            <th>Source</th>
+                            <th>Salary</th>
+                            <th>Exempt/Non-exempt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Alex Morgan</td>
+                            <td class="status-hired">Hired</td>
+                            <td>New York</td>
+                            <td>NY</td>
+                            <td>Financial Analyst</td>
+                            <td>Professional</td>
+                            <td>28</td>
+                            <td>LinkedIn</td>
+                            <td>85000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Sarah Lee</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Dallas</td>
+                            <td>TX</td>
+                            <td>Loan Officer</td>
+                            <td>Professional</td>
+                            <td>35</td>
+                            <td>Indeed</td>
+                            <td>72000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>John Patel</td>
+                            <td class="status-not-hired">Not Hired</td>
+                            <td>Atlanta</td>
+                            <td>GA</td>
+                            <td>Teller</td>
+                            <td>Technicians</td>
+                            <td>20</td>
+                            <td>College/University</td>
+                            <td>38000</td>
+                            <td>Non-exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Priya Kapoor</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Miami</td>
+                            <td>FL</td>
+                            <td>Teller</td>
+                            <td>Technicians</td>
+                            <td>22</td>
+                            <td>Employee Referral</td>
+                            <td>40000</td>
+                            <td>Non-exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Michael Chen</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Denver</td>
+                            <td>CO</td>
+                            <td>Compliance Manager</td>
+                            <td>First/Mid Level Officers and Managers</td>
+                            <td>45</td>
+                            <td>Search Firm</td>
+                            <td>95000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>David Brooks</td>
+                            <td class="status-not-hired">Not Hired</td>
+                            <td>Boston</td>
+                            <td>MA</td>
+                            <td>Loan Processor</td>
+                            <td>Technicians</td>
+                            <td>18</td>
+                            <td>Client Referral</td>
+                            <td>42000</td>
+                            <td>Non-exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Emily Thompson</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Austin</td>
+                            <td>TX</td>
+                            <td>Financial Planner</td>
+                            <td>Professional</td>
+                            <td>31</td>
+                            <td>LinkedIn</td>
+                            <td>88000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Robert Alvarez</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Phoenix</td>
+                            <td>AZ</td>
+                            <td>Teller</td>
+                            <td>Technicians</td>
+                            <td>25</td>
+                            <td>Indeed</td>
+                            <td>39000</td>
+                            <td>Non-exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Karen White</td>
+                            <td class="status-not-hired">Not Hired</td>
+                            <td>Orlando</td>
+                            <td>FL</td>
+                            <td>Loan Officer</td>
+                            <td>Professional</td>
+                            <td>33</td>
+                            <td>Newspaper</td>
+                            <td>71000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Samuel Johnson</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Chicago</td>
+                            <td>IL</td>
+                            <td>HR Business Partner</td>
+                            <td>First/Mid Level Officers and Managers</td>
+                            <td>40</td>
+                            <td>Employee Referral</td>
+                            <td>92000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Lisa Fernandez</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Seattle</td>
+                            <td>WA</td>
+                            <td>IT Support Specialist</td>
+                            <td>Technicians</td>
+                            <td>27</td>
+                            <td>Professional Association</td>
+                            <td>62000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Brian Cooper</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Dallas</td>
+                            <td>TX</td>
+                            <td>Branch Manager</td>
+                            <td>First/Mid Level Officers and Managers</td>
+                            <td>38</td>
+                            <td>Client Referral</td>
+                            <td>90000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Chloe Martinez</td>
+                            <td class="status-not-hired">Not Hired</td>
+                            <td>Houston</td>
+                            <td>TX</td>
+                            <td>Teller</td>
+                            <td>Technicians</td>
+                            <td>21</td>
+                            <td>Other (Yard Sign)</td>
+                            <td>37000</td>
+                            <td>Non-exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Mark Robinson</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Denver</td>
+                            <td>CO</td>
+                            <td>Risk Analyst</td>
+                            <td>Professional</td>
+                            <td>29</td>
+                            <td>College/University</td>
+                            <td>78000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Anita Sharma</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Tampa</td>
+                            <td>FL</td>
+                            <td>Compliance Officer</td>
+                            <td>Professional</td>
+                            <td>26</td>
+                            <td>LinkedIn</td>
+                            <td>83000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Thomas Wright</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Miami</td>
+                            <td>FL</td>
+                            <td>Teller</td>
+                            <td>Technicians</td>
+                            <td>23</td>
+                            <td>Employee Referral</td>
+                            <td>39500</td>
+                            <td>Non-exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Olivia Nguyen</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Boston</td>
+                            <td>MA</td>
+                            <td>Loan Processor</td>
+                            <td>Technicians</td>
+                            <td>20</td>
+                            <td>Indeed</td>
+                            <td>41000</td>
+                            <td>Non-exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Henry Adams</td>
+                            <td class="status-not-hired">Not Hired</td>
+                            <td>Atlanta</td>
+                            <td>GA</td>
+                            <td>Branch Manager</td>
+                            <td>First/Mid Level Officers and Managers</td>
+                            <td>44</td>
+                            <td>Search Firm</td>
+                            <td>89000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Sophia Carter</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Chicago</td>
+                            <td>IL</td>
+                            <td>Risk Manager</td>
+                            <td>First/Mid Level Officers and Managers</td>
+                            <td>39</td>
+                            <td>LinkedIn</td>
+                            <td>94000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Ethan Wilson</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Phoenix</td>
+                            <td>AZ</td>
+                            <td>Teller</td>
+                            <td>Technicians</td>
+                            <td>19</td>
+                            <td>College/University</td>
+                            <td>38500</td>
+                            <td>Non-exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Natalie Brooks</td>
+                            <td class="status-hired">Hired</td>
+                            <td>New York</td>
+                            <td>NY</td>
+                            <td>Financial Analyst</td>
+                            <td>Professional</td>
+                            <td>27</td>
+                            <td>Employee Referral</td>
+                            <td>85000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Kevin Ortiz</td>
+                            <td class="status-not-hired">Not Hired</td>
+                            <td>Austin</td>
+                            <td>TX</td>
+                            <td>IT Support Specialist</td>
+                            <td>Technicians</td>
+                            <td>24</td>
+                            <td>Professional Association</td>
+                            <td>61000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Isabella Rivera</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Denver</td>
+                            <td>CO</td>
+                            <td>Loan Officer</td>
+                            <td>Professional</td>
+                            <td>30</td>
+                            <td>LinkedIn</td>
+                            <td>75000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Logan Price</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Miami</td>
+                            <td>FL</td>
+                            <td>Branch Manager</td>
+                            <td>First/Mid Level Officers and Managers</td>
+                            <td>36</td>
+                            <td>Client Referral</td>
+                            <td>91000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Grace Kim</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Dallas</td>
+                            <td>TX</td>
+                            <td>Compliance Manager</td>
+                            <td>First/Mid Level Officers and Managers</td>
+                            <td>41</td>
+                            <td>Search Firm</td>
+                            <td>97000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Benjamin Scott</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Atlanta</td>
+                            <td>GA</td>
+                            <td>Loan Officer</td>
+                            <td>Professional</td>
+                            <td>34</td>
+                            <td>LinkedIn</td>
+                            <td>74000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Ava Bennett</td>
+                            <td class="status-not-hired">Not Hired</td>
+                            <td>Chicago</td>
+                            <td>IL</td>
+                            <td>Teller</td>
+                            <td>Technicians</td>
+                            <td>18</td>
+                            <td>Indeed</td>
+                            <td>39000</td>
+                            <td>Non-exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Daniel Foster</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Boston</td>
+                            <td>MA</td>
+                            <td>IT Support Specialist</td>
+                            <td>Technicians</td>
+                            <td>26</td>
+                            <td>Employee Referral</td>
+                            <td>61500</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Julia Evans</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Houston</td>
+                            <td>TX</td>
+                            <td>Compliance Officer</td>
+                            <td>Professional</td>
+                            <td>29</td>
+                            <td>Client Referral</td>
+                            <td>82000</td>
+                            <td>Exempt</td>
+                        </tr>
+                        <tr>
+                            <td>Matthew Clark</td>
+                            <td class="status-hired">Hired</td>
+                            <td>Phoenix</td>
+                            <td>AZ</td>
+                            <td>Teller</td>
+                            <td>Technicians</td>
+                            <td>21</td>
+                            <td>College/University</td>
+                            <td>40000</td>
+                            <td>Non-exempt</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="completion-tables">
+            <h2>Tables to Complete</h2>
+            
+            <div class="instructions">
+                <h4>Instructions:</h4>
+                <p>• Analyze the source data table above to complete the following tables</p>
+                <p>• Calculate totals and averages based on the provided data</p>
+                <p>• Round time averages to the nearest whole number</p>
+            </div>
+
+            <div class="table-grid">
+                <div class="completion-table">
+                    <h3>Table 1 – Source Effectiveness</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Source</th>
+                                <th>Total Hires</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Most effective source overall</td>
+                                <td><input type="text" placeholder="Enter source"></td>
+                                <td><input type="text" placeholder="Enter number"></td>
+                            </tr>
+                            <tr>
+                                <td>Top source for job category: Professional</td>
+                                <td><input type="text" placeholder="Enter source"></td>
+                                <td><input type="text" placeholder="Enter number"></td>
+                            </tr>
+                            <tr>
+                                <td>Top source for job category: Technicians</td>
+                                <td><input type="text" placeholder="Enter source"></td>
+                                <td><input type="text" placeholder="Enter number"></td>
+                            </tr>
+                            <tr>
+                                <td>Top source for job category: First/Mid Level Officers and Managers</td>
+                                <td><input type="text" placeholder="Enter source"></td>
+                                <td><input type="text" placeholder="Enter number"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="completion-table">
+                    <h3>Table 2 – Time to Fill (Days)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Average Days</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Average time to fill by job category: Professional</td>
+                                <td><input type="text" placeholder="Enter days"></td>
+                            </tr>
+                            <tr>
+                                <td>Average time to fill by job category: Technicians</td>
+                                <td><input type="text" placeholder="Enter days"></td>
+                            </tr>
+                            <tr>
+                                <td>Average time to fill by job category: First/Mid Level Officers and Managers</td>
+                                <td><input type="text" placeholder="Enter days"></td>
+                            </tr>
+                            <tr>
+                                <td>Average time to fill by most effective source overall</td>
+                                <td><input type="text" placeholder="Enter days"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="submit-section">
+                <button class="submit-btn" onclick="submitTest()">Submit Test</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Timer functionality
+        let timeLeft = 45 * 60; // 45 minutes in seconds
+        
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                alert('Time is up! Please submit your test.');
+                return;
+            }
+            
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        }
+        
+        // Start timer when page loads
+        updateTimer();
+        
+        function submitTest() {
+            if (confirm('Are you sure you want to submit your test? You cannot make changes after submission.')) {
+                alert('Test submitted successfully! Thank you for completing the Customer Service Simulation.');
+                // Here you would typically send the data to your backend
+                // For now, we'll just show a success message
+            }
+        }
+        
+        // Auto-save functionality (optional)
+        function autoSave() {
+            const inputs = document.querySelectorAll('input[type="text"]');
+            const data = {};
+            
+            inputs.forEach((input, index) => {
+                data[index] = input.value;
+            });
+            
+            localStorage.setItem('testData', JSON.stringify(data));
+        }
+        
+        // Load saved data
+        function loadSavedData() {
+            const saved = localStorage.getItem('testData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                const inputs = document.querySelectorAll('input[type="text"]');
+                
+                inputs.forEach((input, index) => {
+                    if (data[index]) {
+                        input.value = data[index];
+                    }
+                });
+            }
+        }
+        
+        // Auto-save every 30 seconds
+        setInterval(autoSave, 30000);
+        
+        // Load saved data when page loads
+        window.addEventListener('load', loadSavedData);
+    </script>
+</body>
+</html>
+{% endblock %}

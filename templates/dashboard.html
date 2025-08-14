@@ -1,0 +1,360 @@
+{% extends "base_molecule.html" %}
+
+{% block title %}Molecule Import Dashboard{% endblock %}
+
+{% block page_title %}Molecule Import Dashboard{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{{ url_for('index', time_filter='daily') }}" 
+       class="btn btn-outline-primary {% if time_filter == 'daily' %}active{% endif %}">
+        Daily
+    </a>
+    <a href="{{ url_for('index', time_filter='weekly') }}" 
+       class="btn btn-outline-primary {% if time_filter == 'weekly' %}active{% endif %}">
+        Weekly
+    </a>
+    <a href="{{ url_for('index', time_filter='monthly') }}" 
+       class="btn btn-outline-primary {% if time_filter == 'monthly' %}active{% endif %}">
+        Monthly
+    </a>
+    <a href="{{ url_for('index', time_filter='yearly') }}" 
+       class="btn btn-outline-primary {% if time_filter == 'yearly' %}active{% endif %}">
+        Yearly
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="fas fa-flask fa-2x mb-2"></i>
+                <div class="stats-number">{{ metrics.price_stats.total_imports|default(0) }}</div>
+                <div>Total Imports</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                <div class="stats-number">₹{{ "%.1f"|format(metrics.price_stats.total_value|default(0) / 1000000) }}M</div>
+                <div>Total Value</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="fas fa-building fa-2x mb-2"></i>
+                <div class="stats-number">{{ metrics.company_stats|length|default(0) }}</div>
+                <div>Active Companies</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body text-center">
+                <i class="fas fa-truck fa-2x mb-2"></i>
+                <div class="stats-number">{{ metrics.top_distributors|length|default(0) }}</div>
+                <div>Distributors</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar"></i> Top Molecules by Import Count
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="moleculeChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie"></i> Company Import Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="companyChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Metrics -->
+<div class="row">
+    <!-- Top Molecules -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-flask"></i> Top Molecules Imported
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Molecule</th>
+                                <th>Category</th>
+                                <th>Import Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for molecule in metrics.top_molecules[:5] %}
+                            <tr>
+                                <td><strong>{{ molecule.name }}</strong></td>
+                                <td><span class="badge bg-info">{{ molecule.category }}</span></td>
+                                <td>{{ molecule.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Molecules by Company -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-building"></i> Top Molecules by Company
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Top Molecule</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in metrics.top_by_company[:5] %}
+                            <tr>
+                                <td><strong>{{ item.company_name }}</strong></td>
+                                <td>{{ item.molecule_name }}</td>
+                                <td>{{ item.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Distributors and Price Analysis -->
+<div class="row mt-4">
+    <!-- Top Distributors -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-truck"></i> Top Distributors
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Distributor</th>
+                                <th>Imports</th>
+                                <th>Total Value</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for distributor in metrics.top_distributors %}
+                            <tr>
+                                <td><strong>{{ distributor.name }}</strong></td>
+                                <td>{{ distributor.count }}</td>
+                                <td>₹{{ "%.2f"|format(distributor.total_value / 1000) }}K</td>
+                                <td>
+                                    <span class="badge bg-warning">
+                                        {{ "%.1f"|format(distributor.rating) }} ⭐
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Analysis -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line"></i> Price Analysis
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h4 class="text-primary">₹{{ "%.2f"|format(metrics.price_stats.avg_price|default(0)) }}</h4>
+                            <small class="text-muted">Average Price</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-success">₹{{ "%.2f"|format(metrics.price_stats.min_price|default(0)) }}</h4>
+                        <small class="text-muted">Min Price</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-danger">₹{{ "%.2f"|format(metrics.price_stats.max_price|default(0)) }}</h4>
+                        <small class="text-muted">Max Price</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-info">{{ metrics.price_stats.total_imports|default(0) }}</h4>
+                        <small class="text-muted">Total Records</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Company Performance -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-area"></i> Company Performance Overview
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Type</th>
+                                <th>Import Count</th>
+                                <th>Total Value</th>
+                                <th>Avg Value per Import</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for company in metrics.company_stats %}
+                            <tr>
+                                <td><strong>{{ company.name }}</strong></td>
+                                <td><span class="badge bg-secondary">{{ company.type }}</span></td>
+                                <td>{{ company.count }}</td>
+                                <td>₹{{ "%.2f"|format(company.total_value / 1000) }}K</td>
+                                <td>₹{{ "%.2f"|format(company.total_value / company.count) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load chart data
+    fetch('/api/chart-data?time_filter={{ time_filter }}')
+        .then(response => response.json())
+        .then(data => {
+            createMoleculeChart(data.molecule_trends);
+            createCompanyChart(data.company_trends);
+        });
+
+    function createMoleculeChart(data) {
+        const ctx = document.getElementById('moleculeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(data),
+                datasets: [{
+                    label: 'Import Quantity',
+                    data: Object.values(data),
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    function createCompanyChart(data) {
+        const ctx = document.getElementById('companyChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(data),
+                datasets: [{
+                    data: Object.values(data),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40',
+                        '#FF6384',
+                        '#C9CBCF'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

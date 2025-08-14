@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User - Insurance System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-edit"></i> Edit User</h2>
+        <a href="{{ url_for('users') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Users
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form action="{{ url_for('edit_user', user_id=user.id) }}" method="POST">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="first_name" class="form-label">First Name *</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" 
+                               value="{{ user.first_name }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="last_name" class="form-label">Last Name *</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" 
+                               value="{{ user.last_name }}" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="dob" class="form-label">Date of Birth *</label>
+                        <input type="date" class="form-control" id="dob" name="dob" 
+                               value="{{ user.dob }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="gender" class="form-label">Gender *</label>
+                        <select class="form-select" id="gender" name="gender" required>
+                            <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Phone Number (India) *</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" 
+                           pattern="[0-9]{10}" placeholder="10 digit number" 
+                           value="{{ user.phone }}" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="area" class="form-label">Area *</label>
+                        <input type="text" class="form-control" id="area" name="area" 
+                               value="{{ user.area }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="mandal" class="form-label">Mandal *</label>
+                        <input type="text" class="form-control" id="mandal" name="mandal" 
+                               value="{{ user.mandal }}" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="district" class="form-label">District *</label>
+                        <input type="text" class="form-control" id="district" name="district" 
+                               value="{{ user.district }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="state" class="form-label">State *</label>
+                        <input type="text" class="form-control" id="state" name="state" 
+                               value="{{ user.state }}" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="address_proof_submitted" class="form-label">Address Proof Submitted? *</label>
+                        <select class="form-select" id="address_proof_submitted" name="address_proof_submitted" required>
+                            <option value="yes" {% if user.address_proof_submitted == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if user.address_proof_submitted == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3" id="proof_name_group" 
+                         style="display: {% if user.address_proof_submitted == 'yes' %}block{% else %}none{% endif %};">
+                        <label for="proof_name" class="form-label">Proof Name</label>
+                        <input type="text" class="form-control" id="proof_name" name="proof_name" 
+                               value="{{ user.proof_name }}" placeholder="e.g., Aadhaar Card, Driving License">
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update User
+                    </button>
+                    <a href="{{ url_for('users') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Show/hide proof name field based on address proof selection
+document.getElementById('address_proof_submitted').addEventListener('change', function() {
+    const proofNameGroup = document.getElementById('proof_name_group');
+    const proofNameInput = document.getElementById('proof_name');
+    
+    if (this.value === 'yes') {
+        proofNameGroup.style.display = 'block';
+        proofNameInput.required = true;
+    } else {
+        proofNameGroup.style.display = 'none';
+        proofNameInput.required = false;
+        proofNameInput.value = '';
+    }
+});
+</script>
+{% endblock %}
