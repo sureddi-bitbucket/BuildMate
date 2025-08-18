@@ -21,20 +21,12 @@ wheels/
 *.egg
 MANIFEST
 
-# Virtual Environment
+# Virtual environments
 venv/
 env/
 ENV/
 env.bak/
 venv.bak/
-
-# Flask
-instance/
-.webassets-cache
-
-# Data files (exclude sample data, keep structure)
-molecule_data.json
-*.json
 
 # IDE
 .vscode/
@@ -45,11 +37,57 @@ molecule_data.json
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# Flask
+instance/
+.webassets-cache
+
+# Data files (keep structure but ignore content)
+data/*.json
+*.xlsx
+*.xls
 
 # Logs
 *.log
+logs/
 
-# Temporary files
-*.tmp
-*.temp
+# Extensions (exclude VS Code extensions)
+extensions/
+
+# Insurance system files (old project)
+insurance_system*.py
+web_insurance_system.py
+run_insurance_system*.bat
+web_requirements.txt
+
+# Old molecule dashboard files
+molecule_dashboard.py
+requirements.txt
+
+# Test files (keep only Import Goods tests)
+test_*.py
+test_*.html
+!test_import_goods.py
+
+# Old templates
+templates/base_molecule.html
+templates/dashboard.html
+templates/companies.html
+templates/molecules.html
+templates/distributors.html
+templates/imports.html
+templates/commissions.html
+templates/edit_*.html
+templates/user_*.html
+templates/policy_*.html
+
+# Keep only Import Goods templates
+!templates/base_import_goods.html
+!templates/custom_date.html
+

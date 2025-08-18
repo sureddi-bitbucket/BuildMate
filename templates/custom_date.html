@@ -1,0 +1,575 @@
+{% extends "base_import_goods.html" %}
+
+{% block title %}Custom Date Analysis - Import Goods{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h2 mb-3">
+            <i class="bi bi-calendar-range me-2"></i>Custom Date Analysis
+        </h1>
+        <p class="text-muted">Analyze import data for specific date ranges and perform ad-hoc searches</p>
+    </div>
+</div>
+
+<!-- Date Range and Search Form -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar3 me-2"></i>Select Date Range & Search Criteria
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('custom_date') }}" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="start_date" class="form-label">Start Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" 
+                               value="{{ start_date }}" required max="{{ today }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="end_date" class="form-label">End Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" 
+                               value="{{ end_date }}" required max="{{ today }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="search_molecule" class="form-label">Search Molecule</label>
+                        <input type="text" class="form-control" id="search_molecule" name="search_molecule" 
+                               value="{{ search_molecule }}" placeholder="Enter molecule name..." maxlength="100">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="search_country" class="form-label">Search Country</label>
+                        <input type="text" class="form-control" id="search_country" name="search_country" 
+                               value="{{ search_country }}" placeholder="Enter country..." maxlength="100">
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search me-1"></i>Analyze Data
+                        </button>
+                        <a href="{{ url_for('custom_date') }}" class="btn btn-outline-secondary ms-2">
+                            <i class="bi bi-arrow-clockwise me-1"></i>Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Display -->
+{% if error %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Error:</strong> {{ error }}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Results Section -->
+{% if metrics %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="h4 mb-3">Analysis Results</h3>
+    </div>
+</div>
+
+<!-- KPIs -->
+<div class="stats-grid">
+    <div class="card kpi-card">
+        <div class="card-body text-center">
+            <div class="kpi-value">{{ metrics.kpis.total_imports | default(0) }}</div>
+            <div class="kpi-label">Total Imports</div>
+        </div>
+    </div>
+    
+    <div class="card kpi-card">
+        <div class="card-body text-center">
+            <div class="kpi-value">{{ "%.2f" | format(metrics.kpis.total_quantity | default(0)) }}</div>
+            <div class="kpi-label">Total Quantity</div>
+        </div>
+    </div>
+    
+    <div class="card kpi-card">
+        <div class="card-body text-center">
+            <div class="kpi-value">{{ metrics.kpis.active_companies | default(0) }}</div>
+            <div class="kpi-label">Active Companies</div>
+        </div>
+    </div>
+    
+    <div class="card kpi-card">
+        <div class="card-body text-center">
+            <div class="kpi-value">{{ metrics.kpis.active_distributors | default(0) }}</div>
+            <div class="kpi-label">Active Distributors</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row">
+    <!-- Top Molecules Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart me-2"></i>Top Molecules by Import Count
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if metrics.charts.molecules %}
+                    <div class="chart-container">
+                        <canvas id="moleculesChart"></canvas>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-bar-chart"></i>
+                        <p>No molecule data available</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Company Distribution Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart me-2"></i>Company Import Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if metrics.charts.companies %}
+                    <div class="chart-container">
+                        <canvas id="companiesChart"></canvas>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-pie-chart"></i>
+                        <p>No company data available</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tables Row -->
+<div class="row">
+    <!-- Top Molecules Table -->
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-flask me-2"></i>Top Molecules
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if metrics.tables.top_molecules %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Molecule</th>
+                                    <th>Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for molecule in metrics.tables.top_molecules[:5] %}
+                                <tr>
+                                    <td>{{ molecule.name }}</td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ molecule.count }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-flask"></i>
+                        <p>No molecules data available</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Companies Table -->
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-building me-2"></i>Top Companies
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if metrics.tables.top_companies %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Count</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for company in metrics.tables.top_companies[:5] %}
+                                <tr>
+                                    <td>{{ company.name }}</td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ company.count }}</span>
+                                    </td>
+                                    <td>{{ "%.2f" | format(company.total_quantity) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-building"></i>
+                        <p>No companies data available</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Distributors Table -->
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-truck me-2"></i>Top Distributors
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if metrics.tables.top_distributors %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Distributor</th>
+                                    <th>Count</th>
+                                    <th>Location</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for distributor in metrics.tables.top_distributors[:5] %}
+                                <tr>
+                                    <td>
+                                        <span data-bs-toggle="tooltip" 
+                                              title="Top molecules: {{ distributor.top_molecules }}&#10;Countries: {{ distributor.countries }}">
+                                            {{ distributor.name }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ distributor.count }}</span>
+                                    </td>
+                                    <td>{{ distributor.location or 'N/A' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-truck"></i>
+                        <p>No distributors data available</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Options -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-download me-2"></i>Export Options
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-success w-100" onclick="exportToCSV()">
+                            <i class="bi bi-file-earmark-text me-2"></i>Export to CSV
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-info w-100" onclick="exportToExcel()">
+                            <i class="bi bi-file-earmark-excel me-2"></i>Export to Excel
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-warning w-100" onclick="printReport()">
+                            <i class="bi bi-printer me-2"></i>Print Report
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-secondary w-100" onclick="shareReport()">
+                            <i class="bi bi-share me-2"></i>Share Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- No Data State -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="empty-state">
+                    <i class="bi bi-calendar-range"></i>
+                    <h4 class="mt-3">Select Date Range to Begin Analysis</h4>
+                    <p class="text-muted">Choose a start date and end date to analyze your import data</p>
+                    <div class="mt-4">
+                        <button type="button" class="btn btn-primary" onclick="setDefaultDates()">
+                            <i class="bi bi-calendar3 me-2"></i>Set Default Range (Last 30 Days)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Date Validation Info -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Note:</strong> Date range cannot exceed 366 days. Use YYYY-MM-DD format for dates.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Set today's date as max for date inputs
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('start_date').max = today;
+    document.getElementById('end_date').max = today;
+    
+    // Set default dates if none selected
+    if (!document.getElementById('start_date').value && !document.getElementById('end_date').value) {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 30);
+        
+        document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
+        document.getElementById('start_date').value = startDate.toISOString().split('T')[0];
+    }
+});
+
+// Date validation
+function validateDates() {
+    const startDate = new Date(document.getElementById('start_date').value);
+    const endDate = new Date(document.getElementById('end_date').value);
+    
+    if (startDate > endDate) {
+        alert('Start date must be before end date');
+        return false;
+    }
+    
+    const diffTime = Math.abs(endDate - startDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays > 366) {
+        alert('Date range cannot exceed 366 days');
+        return false;
+    }
+    
+    return true;
+}
+
+// Set default dates (last 30 days)
+function setDefaultDates() {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    
+    document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
+    document.getElementById('start_date').value = startDate.toISOString().split('T')[0];
+    
+    // Submit form
+    document.querySelector('form').submit();
+}
+
+// Export functions
+function exportToCSV() {
+    if (!validateDates()) return;
+    
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    const searchMolecule = document.getElementById('search_molecule').value;
+    const searchCountry = document.getElementById('search_country').value;
+    
+    const url = `/api/custom-date-data?start_date=${startDate}&end_date=${endDate}&search_molecule=${searchMolecule}&search_country=${searchCountry}`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+                return;
+            }
+            
+            // Convert data to CSV format
+            let csv = 'Molecule,Count\n';
+            if (data.tables && data.tables.top_molecules) {
+                data.tables.top_molecules.forEach(item => {
+                    csv += `"${item.name}",${item.count}\n`;
+                });
+            }
+            
+            // Download CSV
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `import_analysis_${startDate}_to_${endDate}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            console.error('Error exporting data:', error);
+            alert('Error exporting data. Please try again.');
+        });
+}
+
+function exportToExcel() {
+    alert('Excel export functionality will be implemented soon.');
+}
+
+function printReport() {
+    window.print();
+}
+
+function shareReport() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Import Goods Analysis Report',
+            text: 'Check out this import analysis report',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy URL to clipboard
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('Report URL copied to clipboard!');
+        });
+    }
+}
+
+// Search debouncing
+const searchMoleculeInput = document.getElementById('search_molecule');
+const searchCountryInput = document.getElementById('search_country');
+
+const debouncedSearch = debounce(function() {
+    if (document.getElementById('start_date').value && document.getElementById('end_date').value) {
+        document.querySelector('form').submit();
+    }
+}, 500);
+
+searchMoleculeInput.addEventListener('input', debouncedSearch);
+searchCountryInput.addEventListener('input', debouncedSearch);
+
+// Date change handlers
+document.getElementById('start_date').addEventListener('change', function() {
+    if (this.value && document.getElementById('end_date').value) {
+        document.querySelector('form').submit();
+    }
+});
+
+document.getElementById('end_date').addEventListener('change', function() {
+    if (this.value && document.getElementById('start_date').value) {
+        document.querySelector('form').submit();
+    }
+});
+
+// Charts (if metrics available)
+{% if metrics and metrics.charts.molecules %}
+const chartColors = [
+    '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6',
+    '#1abc9c', '#34495e', '#e67e22', '#95a5a6', '#16a085'
+];
+
+// Molecules Chart
+const moleculesCtx = document.getElementById('moleculesChart').getContext('2d');
+const moleculesChart = new Chart(moleculesCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ metrics.charts.molecules | map(attribute='name') | list | tojson }},
+        datasets: [{
+            label: 'Import Count',
+            data: {{ metrics.charts.molecules | map(attribute='count') | list | tojson }},
+            backgroundColor: chartColors.slice(0, {{ metrics.charts.molecules | length }}),
+            borderColor: chartColors.slice(0, {{ metrics.charts.molecules | length }}),
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+
+// Companies Chart
+const companiesCtx = document.getElementById('companiesChart').getContext('2d');
+const companiesChart = new Chart(companiesCtx, {
+    type: 'doughnut',
+    data: {
+        labels: {{ metrics.charts.companies | map(attribute='name') | list | tojson }},
+        datasets: [{
+            data: {{ metrics.charts.companies | map(attribute='count') | list | tojson }},
+            backgroundColor: chartColors.slice(0, {{ metrics.charts.companies | length }}),
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 20,
+                    usePointStyle: true
+                }
+            }
+        }
+    }
+});
+{% endif %}
+</script>
+{% endblock %}
