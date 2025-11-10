@@ -7,6 +7,7 @@ import Register from './components/Auth/Register';
 import DistributorDashboard from './components/Distributor/Dashboard';
 import ConsumerDashboard from './components/Consumer/Dashboard';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import SplashScreen from './components/Common/SplashScreen';
 
 function PrivateRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth();
@@ -78,10 +79,18 @@ function AppRoutes() {
 }
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 1800);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
         <div className="App">
+          {showSplash && <SplashScreen />}
           <AppRoutes />
         </div>
       </Router>

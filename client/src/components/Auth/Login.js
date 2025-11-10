@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './Auth.css';
+import logo from '../../assets/buildmate-logo.svg';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -41,6 +42,9 @@ function Login() {
     <div className="auth-container">
       <div className="auth-box">
         <div className="auth-header">
+          <div className="auth-logo-wrapper">
+            <img src={logo} alt="BuildMate" className="auth-logo" />
+          </div>
           <h1>BuildMate</h1>
           <p>Building Materials Distribution System</p>
           <div style={{ fontSize: '12px', color: '#16a34a', marginTop: '8px' }}>
