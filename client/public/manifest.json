@@ -1,0 +1,25 @@
+{
+  "short_name": "BuildMate",
+  "name": "BuildMate Materials Management",
+  "description": "Distributor-first building materials management system for daily pricing, inventory, and consumer visibility.",
+  "icons": [
+    {
+      "src": "buildmate-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "buildmate-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f766e",
+  "orientation": "portrait-primary",
+  "scope": "."
+}

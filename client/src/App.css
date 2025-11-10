@@ -425,3 +425,36 @@
   }
 }
 
+@media (max-width: 640px) {
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+  }
+
+  .section {
+    padding: 16px;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .table th {
+    font-size: 12px;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .demo-buttons {
+    flex-direction: column;
+  }
+}
+

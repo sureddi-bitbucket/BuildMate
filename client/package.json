@@ -1,14 +1,19 @@
 {
   "name": "buildmate-frontend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
+  "description": "BuildMate standalone PWA frontend for building materials management.",
   "dependencies": {
+    "axios": "^1.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.1",
     "react-scripts": "5.0.1",
-    "axios": "^1.6.2",
-    "web-vitals": "^3.5.0"
+    "web-vitals": "^3.5.0",
+    "workbox-core": "^6.6.0",
+    "workbox-precaching": "^6.6.0",
+    "workbox-routing": "^6.6.0",
+    "workbox-strategies": "^6.6.0"
   },
   "scripts": {
     "start": "react-scripts start",

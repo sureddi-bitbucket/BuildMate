@@ -3,7 +3,6 @@ import api from '../../utils/api';
 
 function Materials() {
   const [prices, setPrices] = useState([]);
-  const [distributors, setDistributors] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,13 +11,8 @@ function Materials() {
 
   const fetchData = async () => {
     try {
-      const [pricesRes, distributorsRes] = await Promise.all([
-        api.get('/prices/all'),
-        api.get('/users/distributors')
-      ]);
-
-      setPrices(pricesRes.data);
-      setDistributors(distributorsRes.data);
+      const { data } = await api.get('/prices/all');
+      setPrices(data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
